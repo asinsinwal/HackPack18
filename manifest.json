@@ -1,0 +1,11 @@
+{
+    "name": "HackPack 2018",
+    "version": "1.0",
+    "description": "Build an Google Calender Extension!",
+    "permissions": ["tabs"],
+    "background": {
+        "scripts": ["script.js"],
+        "persistent": false
+    },
+    "manifest_version": 2
+}
