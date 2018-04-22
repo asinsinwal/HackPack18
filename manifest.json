@@ -1,0 +1,13 @@
+{
+    "name": "Watch your time",
+    "version": "1.0",
+    "description": "Tracks time spent on specified websites",
+    "browser_action":{
+    	"popup": "popup.html"
+    },
+    "background": {
+      "scripts": ["background.js"]
+    },
+    "permissions": ["tabs","storage"],
+    "manifest_version": 2
+  }
