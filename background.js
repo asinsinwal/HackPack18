@@ -35,16 +35,19 @@ chrome.runtime.onInstalled.addListener(function(params){
         console.log(data["timeOnWebsites"]);
 
         // Local storage of json object
-        chrome.storage.local.set(data,function(){});
+        chrome.storage.local.set(data,function(){
+            console.log('Saved data.');
+        });
     }
 });
 
 
 // Retrieve websites from storage
 chrome.storage.onChanged.addListener(function(){
-    chrome.storage.local.get("trackWebsites", function(json_obj){
+    chrome.storage.local.get(null, function(json_obj){
         websitesTracked = JSON.parse(json_obj.trackWebsites);
-        console.log(JSON.parse(json_obj.timeOnWebsites));
+        timeOnWebsites = JSON.parse(json_obj.timeOnWebsites);
+        console.log("New data retrieved.");
     });
 });
 
@@ -52,38 +55,38 @@ initiate();
 
 // Start the extension
 function initiate(){
-    
-    chrome.storage.local.get(null, function(json_obj){
-        day = json_obj["dayTime"];
-        websitesTracked = JSON.parse(json_obj.trackWebsites);
-        timeOnWebsites = JSON.parse(json_obj.timeOnWebsites); 
-    });
+    if(flag){
+        chrome.storage.local.get(null, function(json_obj){
+            websitesTracked = JSON.parse(json_obj.trackWebsites);
+            timeOnWebsites = JSON.parse(json_obj.timeOnWebsites);
+        });
+    }
 
     // Get current active url
     getActiveUrl();
 
     // Handle Multiple events on regular interval
     handleEvents();
-    /*
-        chrome.tabs.onActivated.addListener(function() {
-            getActiveUrl();
-        });
-        chrome.tabs.onUpdated.addListener(function(tab) {
-            getActiveUrl();
-        });
-        chrome.windows.onFocusChanged.addListener(function(value) {
-            // value of window ID
-            if (value === chrome.windows.WINDOW_ID_NONE) {
-                activeUser = false;
-            } else {
-                activeUser = true;
-            }
-            getActiveUrl();
-        });
-    */
-    activeUser = true;
 
-    // Update the storage values
+    // Set the user's activity
+    activeUser = true;  
+
+    // Update the local storage if date is changed
+    setInterval(function(){
+        if( dateChanged() ) {
+            //
+            var newdata = {};
+            day = new Date();
+            newdata["dayTime"] = day;
+            newdata["trackWebsites"] = JSON.stringify(websitesTracked);
+            timeOnWebsites = [0,0,0,0];
+            newdata["timeOnWebsites"] = JSON.stringify(timeOnWebsites);
+            console.log("Date Changed.!");
+            chrome.storage.local.set(newdata,function(){
+                console.log('New data saved.!');
+            });
+        }
+    }, 1000);
 
 }
 
@@ -135,8 +138,24 @@ function handleEvents() {
         getActiveUrl();
     });
 
+    chrome.windows.onRemoved.addListener(function(windowId) {
+        // Create json object
+        var updatedata = {};
+
+        // assign key-value to json object
+        data["dayTime"] = day;
+        data["trackWebsites"] = JSON.stringify(websitesTracked);
+        data["timeOnWebsites"] = JSON.stringify(timeOnWebsites);
+        
+        console.log("Chrome closed");
+        // Local storage of json object
+        chrome.storage.local.set(data,function(){});
+    
+    });
+
     //set interval of 1s
     window.setInterval(setDurationListener, 1000);
+
 }
 
 // To get the domain from active url
@@ -171,4 +190,13 @@ function checkDomainInList(value){
 // Get index of the tracked website
 function getIndexOfDomain(value){
     return websitesTracked.indexOf(value);
+}
+
+// Check if the date is changed
+function dateChanged(){
+    var curr_date = new Date();
+    if(curr_date.getDate() != day.getDate()){
+        return true;
+    }
+    return false;
 }

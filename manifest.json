@@ -5,6 +5,6 @@
     "background": {
       "scripts": ["background.js"]
     },
-    "permissions": ["tabs","storage"],
+    "permissions": ["tabs", "storage"],
     "manifest_version": 2
   }
