@@ -1,11 +1,8 @@
 {
-    "name": "HackPack 2018",
+    "name": "Watch your time",
     "version": "1.0",
-    "description": "Build an Google Calender Extension!",
-    "permissions": ["tabs"],
-    "background": {
-        "scripts": ["script.js"],
-        "persistent": false
-    },
+    "description": "Tracks time spent on specified websites",
+    "background": {"scripts": ["background.js"]},
+    "permissions": ["tabs","storage"],
     "manifest_version": 2
-}
+  }
